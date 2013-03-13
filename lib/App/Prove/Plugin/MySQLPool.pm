@@ -1,7 +1,6 @@
 package App::Prove::Plugin::MySQLPool;
 use strict;
 use warnings;
-use Cache::FastMmap;
 use File::Temp;
 use POSIX::AtFork;
 use Test::mysqld::Pool;
