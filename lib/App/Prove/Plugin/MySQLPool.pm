@@ -1,16 +1,12 @@
 package App::Prove::Plugin::MySQLPool;
-use Mouse;
+use strict;
+use warnings;
 use Cache::FastMmap;
-use File::Temp qw/tempdir/;
+use File::Temp;
 use POSIX::AtFork;
 use Test::mysqld::Pool;
 
 our $VERSION = '0.01';
-
-# prove -PMySQLPool=Test::MyApp::DB -j4 t
-# 1. launches 4 Test::mysqld-s
-# 2. runs `Test::MyApp::DB->prepare( $mysqld )` for each instances
-# 3. inflates $ENV{ PERL_TEST_MYSQLPOOL_DSN } for each test
 
 sub load {
     my ($class, $prove) = @_;
@@ -18,26 +14,25 @@ sub load {
     my $preparer = $args[ 0 ];
     my $jobs     = $prove->{ app_prove }->jobs || 1;
 
-    my $share_file = File::Temp->new();
+    my $share_file = File::Temp->new(); # deleted when DESTROYed
 
     my $pool       = Test::mysqld::Pool->new(
         jobs       => $jobs,
         share_file => $share_file->filename,
         ($preparer ? ( preparer => sub {
             my ($mysqld) = @_;
-            Mouse::Util::load_class( $preparer );
+            eval "require $preparer"; ## no critic
             $preparer->prepare( $mysqld );
         } ) : ()),
     );
     $pool->prepare;
 
     $prove->{ app_prove }{ __PACKAGE__ } = [ $pool, $share_file ]; # ref++
+    $prove->{ app_prove }->formatter('TAP::Formatter::MySQLPool');
 
     $ENV{ PERL_APP_PROVE_PLUGIN_MYSQLPOOL_SHARE_FILE } = $share_file->filename;
 
     POSIX::AtFork->add_to_child( \&child_hook );
-
-    $prove->{app_prove}->formatter('TAP::Formatter::MySQLPool');
 
     1;
 }
@@ -93,21 +88,41 @@ __END__
 
 =head1 NAME
 
-App::Prove::Plugin::MySQLPool -
+App::Prove::Plugin::MySQLPool - pool of Test::mysqld-s reused while testing
 
 =head1 SYNOPSIS
 
-  use App::Prove::Plugin::MySQLPool;
+    prove -j4 -PMySQLPool t
+      or
+    prove -j4 -PMySQLPool=MyApp::Test::DB t
 
 =head1 DESCRIPTION
 
-App::Prove::Plugin::MySQLPool is
+App::Prove::Plugin::MySQLPool is a L<prove> plugin to speedup your tests using a pool of L<Test::mysqld>s.
+
+If you're using Test::mysqld, and have a lot of tests using it, annoyed by the mysql startup time slowing your tests, this module is for you.
+
+This module launches -j number of Test::mysqld instances first.
+
+Next, each mysqld instance optionally calls
+
+    MyApp::Test::DB->prepare( $mysqld );
+
+you can CREATE DATABASEs, or CREATE TABLEs, or bulk insert master data before start testing.
+
+Use $ENV{ PERL_TEST_MYSQLPOOL_DSN } like following in your test code.
+
+    DBI->connect( $ENV{ PERL_TEST_MYSQLPOOL_DSN } );
+
+Since this module reuses mysqlds, you'd better erase all rows inserted in previous tests before using it.
 
 =head1 AUTHOR
 
 Masakazu Ohtsuka E<lt>o.masakazu@gmail.comE<gt>
 
 =head1 SEE ALSO
+
+L<prove>, L<Test::mysqld>
 
 =head1 LICENSE
 

@@ -1,4 +1,6 @@
 package Test::mysqld::Pool;
+use strict;
+use warnings;
 use Mouse;
 use Test::mysqld;
 use Cache::FastMmap;
@@ -11,6 +13,9 @@ has cache        => ( is => 'rw', lazy => 1,
 
                           # only need this for atomical get_and_set
                           # is there anything better?
+
+                          # dont let Cache::FastMmap delete the share_file,
+                          # File::Temp does that
                           return Cache::FastMmap->new(
                               share_file     => $self->share_file,
                               init_file      => 0,
@@ -46,11 +51,10 @@ sub _launch_instance {
     my ($self) = @_;
 
     # auto start
-    my $mysqld = Test::mysqld->new(
-        my_cnf     => $self->my_cnf,
-    ) or die $Test::mysqld::errstr;
+    my $mysqld = Test::mysqld->new( my_cnf => $self->my_cnf )
+        or die $Test::mysqld::errstr;
 
-    # user code to prepare database before launching instances
+    # user code to prepare database before test
     $self->preparer->( $mysqld )
         if $self->preparer;
 
@@ -130,6 +134,7 @@ Test::mysqld::Pool - create a pool of Test::mysqld-s
     },
     jobs   => 2,
   ) or plan skip_all => $Test::mysqld::errstr;
+
   my $dsn1 = $pool->alloc; # in process 1
   my $dsn2 = $pool->alloc; # in process 2
   # my $dsn3 = $pool->alloc; # blocks
@@ -137,6 +142,6 @@ Test::mysqld::Pool - create a pool of Test::mysqld-s
   # after process 1 death
   $pool->dealloc_unused;
 
-  my $dsn3 = $pool->alloc; # in process 3
+  my $dsn3 = $pool->alloc; # in process 3 (get dsn from pool; reused $dns of process 1)
 
 =cut
