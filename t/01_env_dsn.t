@@ -4,7 +4,10 @@ use warnings;
 
 use t::Util;
 
-my $out = run_test(qw!t/plx/1.plx t/plx/2.plx!);
+my $out = run_test({
+    tests => [ 't/plx/1.plx', 't/plx/2.plx' ],
+});
+exit_status_is( 0 );
 
 my (@dsns) = ( $out =~ m!dsn:(.+)$!gm );
 

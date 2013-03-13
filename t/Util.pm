@@ -7,12 +7,16 @@ use parent qw/Exporter/;
 use App::Prove;
 use Test::More;
 use File::Temp qw/ tempfile /;
+use DBI;
+use POSIX;
 
-our @EXPORT = qw/run_test/;
+our @EXPORT = qw/run_test exit_status_is/;
 
 # thanks to http://cpansearch.perl.org/src/TOKUHIROM/Test-Pretty-0.24/t/Util.pm
 sub run_test {
-    my (@tests) = @_;
+    my ($options) = @_;
+    my $preparer = $options->{ preparer };
+    my $tests    = $options->{ tests };
 
     my ($tmp, $filename) = tempfile();
     close $tmp;
@@ -38,12 +42,36 @@ sub run_test {
         my $prove = App::Prove->new();
         $prove->process_args( '--norc',
                               '-v',
-                              '-PMySQLPool',
-                              '-j'.(scalar @tests),
-                              @tests );
-        $prove->run();
-        exit;
+                              ($preparer ? "-PMySQLPool=$preparer"
+                                         : "-PMySQLPool"),
+                              '-j'.(scalar @$tests),
+                              @$tests );
+        exit( $prove->run() ? 0 : 1 );
     }
+}
+
+sub exit_status_is {
+    my ($expected) = @_;
+
+    if ($^O eq 'MSWin32') {
+        is($?, $expected);
+    } else {
+        ok(POSIX::WIFEXITED($?));
+        is(POSIX::WEXITSTATUS($?), $expected);
+    }
+}
+
+sub prepare {
+    my ($package, $mysqld) = @_;
+
+    my $dbh = DBI->connect( $mysqld->dsn )
+        or die $DBI::errstr;
+
+    my $create_table = 'CREATE TABLE t1 (user_id INTEGER UNSIGNED NOT NULL)';
+    $dbh->do( $create_table );
+
+    my $insert = 'INSERT t1 VALUES (1)';
+    $dbh->do( $insert );
 }
 
 1;

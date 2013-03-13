@@ -13,6 +13,8 @@ tests 't/*.t';
 author_tests 'xt';
 
 test_requires 'Test::More';
+test_requires 'DBI';
+test_requires 'POSIX';
 
 auto_set_repository;
 auto_include;
