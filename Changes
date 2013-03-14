@@ -2,6 +2,8 @@ Revision history for Perl extension App::Prove::Plugin::MySQLPool
 
 0.02 2013-03-14T15:22:02+09:00
      - removed README.pod from cpan
+     - add 'lib' to @INC for preparer, when prove invoked with '-l' flag
+     - more kind error message when preparer load failed
 
 0.01 2013-03-13T22:35:01+09:00
      - original version
