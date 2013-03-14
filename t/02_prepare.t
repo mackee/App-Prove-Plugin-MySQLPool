@@ -1,6 +1,7 @@
 use Test::More;
 use strict;
 use warnings;
+use Test::Requires qw/DBI/;
 
 use t::Util;
 

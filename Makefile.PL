@@ -12,10 +12,10 @@ requires 'Test::mysqld';
 tests 't/*.t';
 author_tests 'xt';
 
-test_requires 'DBI';
 test_requires 'File::Temp';
 test_requires 'POSIX';
 test_requires 'Test::More';
+test_requires 'Test::Requires';
 
 auto_set_repository;
 auto_include;
