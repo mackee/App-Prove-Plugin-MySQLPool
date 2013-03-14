@@ -107,13 +107,21 @@ Next, each mysqld instance optionally calls
 
     MyApp::Test::DB->prepare( $mysqld );
 
-you can CREATE DATABASEs, or CREATE TABLEs, or bulk insert master data before start testing.
+You can CREATE TABLEs using L<GitDDL> or L<DBIx::Class::Schema::Loader> or others,
+or bulk insert master data before start testing.
+
+MyApp::Test::DB only needs to implement a C<prepare> sub.
+C<prepare> is called only once per -j number of mysqld instances,
+and is called before your first .t file get tested.
 
 Use $ENV{ PERL_TEST_MYSQLPOOL_DSN } like following in your test code.
 
-    DBI->connect( $ENV{ PERL_TEST_MYSQLPOOL_DSN } );
+    my $dbh = DBI->connect( $ENV{ PERL_TEST_MYSQLPOOL_DSN } );
 
-Since this module reuses mysqlds, you'd better erase all rows inserted in previous tests before using it.
+Since this module reuses mysqlds,
+you'd better erase all rows inserted at the top of your tests.
+
+    $dbh->do( "TRUNCATE $_" ) for @tables;
 
 =head1 AUTHOR
 

@@ -142,6 +142,6 @@ Test::mysqld::Pool - create a pool of Test::mysqld-s
   # after process 1 death
   $pool->dealloc_unused;
 
-  my $dsn3 = $pool->alloc; # in process 3 (get dsn from pool; reused $dns of process 1)
+  my $dsn3 = $pool->alloc; # in process 3 (get dsn from pool; reused $dsn of process 1)
 
 =cut
