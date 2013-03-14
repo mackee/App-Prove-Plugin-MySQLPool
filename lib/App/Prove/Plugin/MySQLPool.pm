@@ -25,7 +25,9 @@ sub load {
             push( @INC, 'lib' )
                 if $lib;
 
-            eval "require $preparer"; ## no critic
+            eval "require $preparer"
+                or die "$@"; ## no critic
+
             $preparer->prepare( $mysqld );
         } ) : ()),
     );
