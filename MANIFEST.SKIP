@@ -12,6 +12,7 @@
 ^MakeMaker-\d
 \.gz$
 \.cvsignore
+\.prove$
 ^t/9\d_.*\.t
 ^t/perlcritic
 ^tools/
