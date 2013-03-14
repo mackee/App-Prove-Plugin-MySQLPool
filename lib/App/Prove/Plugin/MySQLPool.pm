@@ -12,6 +12,7 @@ sub load {
     my @args     = @{ $prove->{args} };
     my $preparer = $args[ 0 ];
     my $jobs     = $prove->{ app_prove }->jobs || 1;
+    my $lib      = $prove->{ app_prove }->lib;
 
     my $share_file = File::Temp->new(); # deleted when DESTROYed
 
@@ -20,6 +21,10 @@ sub load {
         share_file => $share_file->filename,
         ($preparer ? ( preparer => sub {
             my ($mysqld) = @_;
+
+            push( @INC, 'lib' )
+                if $lib;
+
             eval "require $preparer"; ## no critic
             $preparer->prepare( $mysqld );
         } ) : ()),
