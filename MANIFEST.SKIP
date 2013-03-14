@@ -3,6 +3,7 @@
 ^MANIFEST\.
 ^Makefile$
 ^MYMETA\.
+^README\.pod$
 ~$
 ^#
 \.old$
