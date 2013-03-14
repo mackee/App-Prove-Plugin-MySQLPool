@@ -114,6 +114,13 @@ MyApp::Test::DB only needs to implement a C<prepare> sub.
 C<prepare> is called only once per -j number of mysqld instances,
 and is called before your first .t file get tested.
 
+    # MyApp::Test::DB
+    sub prepare {
+        my ($package, $mysqld) = @_;
+        my $gd = GitDDL->new( dsn => $mysqld->dsn, ... );
+        $gd->deploy;
+    }
+
 Use $ENV{ PERL_TEST_MYSQLPOOL_DSN } like following in your test code.
 
     my $dbh = DBI->connect( $ENV{ PERL_TEST_MYSQLPOOL_DSN } );
