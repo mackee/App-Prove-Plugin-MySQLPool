@@ -1,5 +1,8 @@
 Revision history for Perl extension App::Prove::Plugin::MySQLPool
 
+0.04 2013-03-19T18:11:00+09:00
+     - fix dependencies
+
 0.03 2013-03-14T23:40:00+09:00
      - dont include DBI in test_requires
      - perlcritic
