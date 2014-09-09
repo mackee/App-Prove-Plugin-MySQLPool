@@ -15,21 +15,23 @@ sub load {
     my $lib      = $prove->{ app_prove }->lib;
 
     my $share_file = File::Temp->new(); # deleted when DESTROYed
-
     my $pool       = Test::mysqld::Pool->new(
         jobs       => $jobs,
         share_file => $share_file->filename,
-        ($preparer ? ( preparer => sub {
-            my ($mysqld) = @_;
+        ($preparer ? (
+            preparer => sub {
+                my ($mysqld) = @_;
 
-            push( @INC, 'lib' )
-                if $lib;
+                push( @INC, 'lib' )
+                    if $lib;
 
-            eval "require $preparer" ## no critic
-                or die "$@";
+                eval "require $preparer" ## no critic
+                    or die "$@";
 
-            $preparer->prepare( $mysqld );
-        } ) : ()),
+                $preparer->prepare( $mysqld );
+            },
+            $preparer->can('my_cnf') ? ( my_cnf => $preparer->my_cnf ) : (),
+        ) : ()),
     );
     $pool->prepare;
 
@@ -136,6 +138,19 @@ Since this module reuses mysqlds,
 you'd better erase all rows inserted at the top of your tests.
 
     $dbh->do( "TRUNCATE $_" ) for @tables;
+
+If you need customize my.cnf, you may want to implement C<my_cnf> method in MyApp::Test::DB.
+
+    # MyApp::Test::DB
+    sub my_cnf {
+        +{
+            "skip-networking" => "",
+            "character-set-server" => "utf8mb4",
+        };
+    }
+
+This config is used before launching Test::mysqld instances.
+So you can set non-dynamic system variables.
 
 =head1 AUTHOR
 
