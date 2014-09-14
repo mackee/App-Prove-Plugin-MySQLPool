@@ -9,3 +9,11 @@ Makefile.old
 nytprof.out
 MANIFEST.bak
 *.sw[po]
+/App-Prove-Plugin-MySQLPool-*
+/.build
+/_build_params
+/Build
+/Build.bat
+!Build/
+!META.json
+!LICENSE
