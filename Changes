@@ -2,6 +2,9 @@ Revision history for Perl extension App::Prove::Plugin::MySQLPool
 
 {{$NEXT}}
 
+0.05 2014-09-15T10:50:43Z
+     - add custom my.cnf support
+
 0.04 2013-03-19T18:11:00+09:00
      - fix dependencies
 

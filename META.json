@@ -72,7 +72,7 @@
          "web" : "https://github.com/mash/App-Prove-Plugin-MySQLPool"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "mackee <macopy123@gmail.com>"
    ]
