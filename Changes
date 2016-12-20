@@ -2,6 +2,9 @@ Revision history for Perl extension App::Prove::Plugin::MySQLPool
 
 {{$NEXT}}
 
+0.06 2016-12-20T12:07:54Z
+    - using Test::mysqld->start_mysqls in launch mysqld servers (shogo82148)
+
 0.05 2014-09-15T11:43:21Z
      - add custom my.cnf support
 

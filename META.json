@@ -4,7 +4,7 @@
       "Masakazu Ohtsuka <o.masakazu@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.1.1, CPAN::Meta::Converter version 2.141520",
+   "generated_by" : "Minilla/v3.0.7, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -55,7 +55,7 @@
             "File::Temp" : "0",
             "Mouse" : "0",
             "POSIX::AtFork" : "0",
-            "Test::mysqld" : "0",
+            "Test::mysqld" : "0.20",
             "parent" : "0"
          }
       }
@@ -68,12 +68,14 @@
       "homepage" : "https://github.com/mash/App-Prove-Plugin-MySQLPool",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mash/App-Prove-Plugin-MySQLPool",
+         "url" : "git://github.com/mash/App-Prove-Plugin-MySQLPool.git",
          "web" : "https://github.com/mash/App-Prove-Plugin-MySQLPool"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
+      "Ichinose Shogo <shogo82148@gmail.com>",
       "mackee <macopy123@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }
