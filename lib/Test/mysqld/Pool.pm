@@ -4,7 +4,6 @@ use warnings;
 use Mouse;
 use Test::mysqld;
 use Cache::FastMmap;
-use Test::mysqld::Multi;
 
 has jobs         => ( is => 'rw', isa => 'Int', );
 has share_file   => ( is => 'rw', isa => 'Str', required => 1 );
@@ -38,7 +37,7 @@ has _owner_pid   => ( is => 'ro', isa => 'Int', default => sub { $$ } );
 sub prepare {
     my ($self) = @_;
 
-    my @instances = Test::mysqld::Multi->start_mysqlds($self->jobs, my_cnf => $self->my_cnf);
+    my @instances = Test::mysqld->start_mysqlds($self->jobs, my_cnf => $self->my_cnf);
     $self->instances( \@instances );
     if ($self->preparer) {
         $self->preparer->($_) for @instances;
@@ -106,7 +105,7 @@ sub _pid_lives {
 
 sub DESTROY {
     my $self = shift;
-    Test::mysqld::Multi->stop_mysqlds(@{$self->instances})
+    Test::mysqld->stop_mysqlds(@{$self->instances})
             if $self->instances && $$ == $self->_owner_pid;
 }
 
