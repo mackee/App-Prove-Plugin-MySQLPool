@@ -3,7 +3,7 @@ requires 'Cache::FastMmap';
 requires 'File::Temp';
 requires 'Mouse';
 requires 'POSIX::AtFork';
-requires 'Test::mysqld';
+requires 'Test::mysqld', '0.20';
 requires 'parent';
 
 on build => sub {

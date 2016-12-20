@@ -32,33 +32,21 @@ has my_cnf       => ( is => 'rw', isa => 'HashRef',
                           };
                       } );
 has instances    => ( is => 'rw', isa => 'ArrayRef' );
+has _owner_pid   => ( is => 'ro', isa => 'Int', default => sub { $$ } );
 
 sub prepare {
     my ($self) = @_;
 
-    my @instances = map {
-        $self->_launch_instance;
-    } (1 .. $self->jobs);
+    my @instances = Test::mysqld->start_mysqlds($self->jobs, my_cnf => $self->my_cnf);
     $self->instances( \@instances );
+    if ($self->preparer) {
+        $self->preparer->($_) for @instances;
+    }
 
     $self->cache->clear;
     $self->cache->set( dsns => {
         map { $_->dsn => 0 } @instances
     });
-}
-
-sub _launch_instance {
-    my ($self) = @_;
-
-    # auto start
-    my $mysqld = Test::mysqld->new( my_cnf => $self->my_cnf )
-        or die $Test::mysqld::errstr;
-
-    # user code to prepare database before test
-    $self->preparer->( $mysqld )
-        if $self->preparer;
-
-    return $mysqld;
 }
 
 sub alloc {
@@ -113,6 +101,12 @@ sub _pid_lives {
     my $command = "ps -o pid -p $pid | grep $pid";
     my @lines   = qx{$command};
     return scalar @lines;
+}
+
+sub DESTROY {
+    my $self = shift;
+    Test::mysqld->stop_mysqlds(@{$self->instances})
+            if $self->instances && $$ == $self->_owner_pid;
 }
 
 1;
