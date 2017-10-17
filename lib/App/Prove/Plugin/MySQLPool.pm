@@ -5,7 +5,7 @@ use File::Temp;
 use POSIX::AtFork;
 use Test::mysqld::Pool;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub load {
     my ($class, $prove) = @_;

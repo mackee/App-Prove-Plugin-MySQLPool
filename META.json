@@ -4,7 +4,7 @@
       "Masakazu Ohtsuka <o.masakazu@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Minilla/v3.0.7, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -72,9 +72,10 @@
          "web" : "https://github.com/mackee/App-Prove-Plugin-MySQLPool"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_contributors" : [
       "skozawa <skozawa@hatena.ne.jp>",
+      "Kenichi Ishigaki <ishigaki@cpan.org>",
       "Ichinose Shogo <shogo82148@gmail.com>",
       "mackee <macopy123@gmail.com>"
    ],
