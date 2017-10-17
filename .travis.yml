@@ -10,3 +10,7 @@ perl:
 - '5.12'
 - '5.10'
 sudo: false
+dist: trusty
+before_script:
+  - sudo cp /etc/mysql/my.cnf /usr/share/mysql/my-default.cnf
+
