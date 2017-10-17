@@ -1,5 +1,6 @@
 language: perl
 perl:
+- '5.26'
 - '5.24'
 - '5.22'
 - '5.20'
@@ -8,3 +9,8 @@ perl:
 - '5.14'
 - '5.12'
 - '5.10'
+sudo: false
+dist: trusty
+before_script:
+  - sudo cp /etc/mysql/my.cnf /usr/share/mysql/my-default.cnf
+
