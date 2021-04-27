@@ -1,6 +1,6 @@
 use Test::More;
-plan skip_all => 'mysql_install_db not found'
-    unless `which mysql_install_db 2>/dev/null`;
+plan skip_all => 'mysql_install_db or mysqld --intiialize-insecure are not found'
+    unless `which mysql_install_db 2>/dev/null` || `mysqld --verbose --help 2>/dev/null | grep '\\--initialize-insecure'`;
 use strict;
 use warnings;
 
