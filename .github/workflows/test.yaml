@@ -1,0 +1,98 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: list
+        id: set-matrix
+        run: |
+          import json
+          perl = [
+              '5.30',
+              '5.28',
+              '5.26',
+              '5.24',
+              '5.22',
+              '5.20',
+              '5.18',
+              '5.16',
+              '5.14',
+              '5.12',
+              '5.10',
+          ]
+          mysql = [
+              '5.6',
+              # TODO: tests are broken. fix me!
+              # '5.7',
+              '8.0',
+              # TODO: tests are broken. fix me!
+              # 'mariadb-10.5',
+              # 'mariadb-10.4',
+              # 'mariadb-10.3',
+          ]
+          includes = []
+          # perl versions compatibility check
+          for v in perl[1:]:
+              includes.append({'os': 'ubuntu-latest', 'perl': v, 'mysql': mysql[0]})
+          matrix = {
+              # OS vs MySQL versions
+              'os': [ 'ubuntu-latest', 'macos-latest' ],
+              'perl': [ perl[0] ],
+              'mysql': mysql,
+              'include': includes
+          }
+          output = json.dumps(matrix, separators=(',', ':'))
+          print('::set-output name=matrix::{0}'.format(output))
+        shell: python
+  test:
+    needs: list
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.list.outputs.matrix) }}
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+
+      - name: install MySQL
+        id: mysql
+        uses: shogo82148/actions-setup-mysql@v1
+        with:
+          mysql-version: ${{ matrix.mysql }}
+          auto-start: false
+      - name: configure MySQL Library
+        shell: bash
+        run: |
+          MYSQL=$(cd "$(dirname "$(which mysql)")" && cd .. && pwd)
+          # see https://metacpan.org/pod/distribution/DBD-mysql/lib/DBD/mysql/INSTALL.pod#Environment-Variables
+          cat <<__END__ > "$GITHUB_ENV"
+          PATH=${MYSQL}/scripts:$PATH
+          PERL5LIB=$GITHUB_WORKSPACE/local/lib/perl5
+          __END__
+
+          # we can't overwrite DYLD_LIBRARY_PATH because of https://en.wikipedia.org/wiki/System_Integrity_Protection
+          ln -s "${MYSQL}"/lib/libmysql* /usr/local/lib ||:
+          ln -s "${MYSQL}"/lib/libmaria* /usr/local/lib ||:
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            local
+          key: ${{ runner.os }}-${{ matrix.perl }}-${{ hashFiles('**/cpanfile') }}
+
+      - name: install dependencies
+        run: |
+          cpm install --show-build-log-on-failure
+      - run: perl Build.PL
+      - run: ./Build build
+      - run: ./Build test
