@@ -13,6 +13,7 @@ my $out = run_test({
     tests    => [ 't/plx/prepare.plx' ],
     preparer => 't::Util',
 });
-exit_status_is( 0 );
+exit_status_is( 0 )
+    or diag "out = '$out'";
 
 done_testing;
